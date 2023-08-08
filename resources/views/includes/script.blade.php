@@ -52,7 +52,7 @@
             @isset($marker['html_description'])
                 .setPopup(new mapboxgl.Popup({
                     offset: 25
-                }).setHtml('{{ $marker['html_description'] }}'))
+                }).setHTML(`{{ $marker['html_description'] }}`))
             @endisset
             .addTo(map);
         @else
@@ -66,7 +66,7 @@
             @isset($marker['html_description'])
                 .setPopup(new mapboxgl.Popup({
                     offset: 25
-                }).setHtml('{{ $marker['html_description'] }}'))
+                }).setHTML(`{{ $marker['html_description'] }}`))
             @endisset
             .addTo(map);
         @endif
