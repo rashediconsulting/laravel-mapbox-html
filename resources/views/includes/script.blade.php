@@ -41,34 +41,65 @@
         @if (isset($marker['icon']))
             const el{{ $key }} = document.createElement('div');
             el{{ $key }}.className = 'marker';
-            el{{ $key }}.innerHTML = `{!! $marker['icon'] !!}`;
+
+            @if (isset($marker['icon_active']))
+                el{{ $key }}.innerHTML = `<span class="main-icon">{!! $marker['icon'] !!}</span>` + `<span class="active-icon" style="display:none;">{!! $marker['icon_active'] !!}</span>`
+            @elseif (isset($marker['icon']))
+                el{{ $key }}.innerHTML = `<span class="main-icon">{!! $marker['icon'] !!}</span>`;
+            @endif
+
             new mapboxgl.Marker(el{{ $key }})
                 .setLngLat([{{ $marker['long'] }}, {{ $marker['lat'] }}])
-            @isset($marker['description'])
                 .setPopup(new mapboxgl.Popup({
                     offset: 25
-                }).setText('{{ $marker['description'] }}'))
-            @endisset
-            @isset($marker['html_description'])
-                .setPopup(new mapboxgl.Popup({
-                    offset: 25
-                }).setHTML(`{{ $marker['html_description'] }}`))
-            @endisset
-            .addTo(map);
+                })
+                @isset($marker['description'])
+                    .setText('{{ $marker['description'] }}')
+                @endisset
+                @isset($marker['html_description'])
+                    .setHTML(`{{ $marker['html_description'] }}`)
+                @endisset
+                    .on("close", resetIcons)
+                @if (isset($marker['icon_active']))
+                    .on("open", switchIcons)
+                @endif
+            ).addTo(map);
         @else
             new mapboxgl.Marker()
                 .setLngLat([{{ $marker['long'] }}, {{ $marker['lat'] }}])
-            @isset($marker['description'])
                 .setPopup(new mapboxgl.Popup({
                     offset: 25
-                }).setText('{{ $marker['description'] }}'))
-            @endisset
-            @isset($marker['html_description'])
-                .setPopup(new mapboxgl.Popup({
-                    offset: 25
-                }).setHTML(`{{ $marker['html_description'] }}`))
-            @endisset
-            .addTo(map);
+                })
+                @isset($marker['description'])
+                    .setText('{{ $marker['description'] }}')
+                @endisset
+                @isset($marker['html_description'])
+                    .setHTML(`{{ $marker['html_description'] }}`)
+                @endisset
+                @if (isset($marker['icon_active']))
+                    .on("close", resetIcons)
+                    .on("open", switchIcons)
+                @endif
+            ).addTo(map);
         @endif
     @endforeach
+
+    function resetIcons(){
+         const icons = document.querySelectorAll('.main-icon');
+
+        icons.forEach(icon => {
+          icon.style.display = 'block';
+        });
+
+        const active_icons = document.querySelectorAll('.active-icon');
+
+        active_icons.forEach(a_icon => {
+          a_icon.style.display = 'none';
+        });
+    }
+
+    function switchIcons(e){
+        e.target._marker._element.getElementsByClassName("main-icon")[0].style.display = 'none'
+        e.target._marker._element.getElementsByClassName("active-icon")[0].style.display = "block"
+    }
 </script>
