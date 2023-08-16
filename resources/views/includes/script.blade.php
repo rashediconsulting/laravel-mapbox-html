@@ -67,7 +67,7 @@
                     .setText('{{ $marker['description'] }}')
                 @endisset
                 @isset($marker['html_description'])
-                    .setHTML(`{{ $marker['html_description'] }}`)
+                    .setHTML(`{!! $marker['html_description'] !!}`)
                 @endisset
                     .on("close", resetIcons)
                 @if (isset($marker['icon_active']))
@@ -84,7 +84,7 @@
                     .setText('{{ $marker['description'] }}')
                 @endisset
                 @isset($marker['html_description'])
-                    .setHTML(`{{ $marker['html_description'] }}`)
+                    .setHTML(`{!! $marker['html_description'] !!}`)
                 @endisset
                 @if (isset($marker['icon_active']))
                     .on("close", resetIcons)
