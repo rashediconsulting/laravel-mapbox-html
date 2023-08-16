@@ -12,11 +12,21 @@
     const map = new mapboxgl.Map({
         container: '{{ $id }}',
         style: 'mapbox://styles/{{ $mapStyle }}',
-        center: [{{ $center['long'] ?? $center[0] }}, {{ $center['lat'] ?? $center[1] }}],
+        {{--center: [{{ $center['long'] ?? $center[0] }}, {{ $center['lat'] ?? $center[1] }}],--}}
         zoom: {{ $zoom }},
         interactive: {{ $interactive ? 'true' : 'false' }},
         cooperativeGestures: {{ $cooperativeGestures ? 'true' : 'false' }},
     });
+
+    @if(isset($center['long']) || is_numeric($center[0]))
+        map.flyTo({
+            center: [{{ $center['long'] ?? $center[0] }}, {{ $center['lat'] ?? $center[1] }}]
+        });
+    @else
+        map.fitBounds({{json_encode($center)}});
+    @endif
+
+
 
     {{ $navigationControls ? 'map.addControl(new mapboxgl.NavigationControl());' : '' }}
 
@@ -85,7 +95,7 @@
     @endforeach
 
     function resetIcons(){
-         const icons = document.querySelectorAll('.main-icon');
+        const icons = document.querySelectorAll('.main-icon');
 
         icons.forEach(icon => {
           icon.style.display = 'block';
