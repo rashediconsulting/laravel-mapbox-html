@@ -62,6 +62,8 @@
                 .setLngLat([{{ $marker['long'] }}, {{ $marker['lat'] }}])
                 .setPopup(new mapboxgl.Popup({
                     offset: 25
+                    {!!isset($marker['anchor']) ? ', anchor: "' . $marker['anchor'] . '"' : '' !!}
+                    {!!isset($marker['anchor']) ? ', flyToOnOpen:' . $marker['flyToOnOpen'] : '' !!}
                 })
                 @isset($marker['description'])
                     .setText('{{ $marker['description'] }}')
@@ -69,9 +71,9 @@
                 @isset($marker['html_description'])
                     .setHTML(`{!! $marker['html_description'] !!}`)
                 @endisset
-                    .on("close", resetIcons)
+                    .on("close", markerCloseActions)
                 @if (isset($marker['icon_active']))
-                    .on("open", switchIcons)
+                    .on("open", markerOpenActions)
                 @endif
             ).addTo(map);
         @else
@@ -87,14 +89,14 @@
                     .setHTML(`{!! $marker['html_description'] !!}`)
                 @endisset
                 @if (isset($marker['icon_active']))
-                    .on("close", resetIcons)
-                    .on("open", switchIcons)
+                    .on("close", markerCloseActions)
+                    .on("open", markerOpenActions)
                 @endif
             ).addTo(map);
         @endif
     @endforeach
 
-    function resetIcons(){
+    function markerCloseActions(){
         const icons = document.querySelectorAll('.main-icon');
 
         icons.forEach(icon => {
@@ -108,7 +110,20 @@
         });
     }
 
-    function switchIcons(e){
+    function markerOpenActions(e){
+
+        if(e.target.options.flyToOnOpen){
+            let center = {
+                lng: e.target.getLngLat().lng + 0.07,
+                lat: e.target.getLngLat().lat - 0.16
+            };
+
+            map.flyTo({
+                center: center,
+                zoom: 10
+            });
+        }
+
         e.target._marker._element.getElementsByClassName("main-icon")[0].style.display = 'none'
         e.target._marker._element.getElementsByClassName("active-icon")[0].style.display = "block"
     }
